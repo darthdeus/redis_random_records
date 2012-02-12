@@ -1,2 +1,5 @@
 $:.unshift File.dirname(__FILE__) + '/../'
+require 'rubygems'
 require 'rspec'
+require 'redis'
+require 'redis-namespace'

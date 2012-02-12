@@ -15,4 +15,6 @@ gem 'slim'
 
 group :development, :test do
   gem 'rspec'
+  gem 'redis-namespace'
+  gem 'pry'
 end

@@ -1,165 +1,43 @@
-require File.dirname(__FILE__) + '/spec_helper'
+require 'rubygems'
+require 'rspec'
+require 'redis'
+require 'redis-namespace'
+require 'ohm'
+require 'pry'
 
 class Parser
+  def dump(instance, data)
+    data["loans"]
+  end
+end
 
+class Loan < Ohm::Model
+  %w{name description status funded_amount basket_amount image activity sector use location partner_id posted_date planned_expiration_date loan_amount borrower_count}.each do |attr|
+    attribute attr
+  end
 end
 
 describe Parser do
   before do
     @data = {"paging"=>{"page"=>1, "total"=>2632, "page_size"=>20, "pages"=>132},
              "loans"=>
-                 [{"id"=>389754, "name"=>"Vilma Pacheco Anillo", "description"=>{"languages"=>["es", "en"]},
-                   "status"=>"fundraising", "funded_amount"=>0, "basket_amount"=>0,
-                   "image"=>{"id"=>1001593, "template_id"=>1}, "activity"=>"Pigs", "sector"=>"Agriculture",
+                 [{"id"=>389754,
+                  "name"=>"Vilma Pacheco Anillo",
+                  "description"=>{"languages"=>["es", "en"]},
+                   "status"=>"fundraising",
+                   "funded_amount"=>0,
+                   "basket_amount"=>0,
+                   "image"=>{"id"=>1001593, "template_id"=>1},
+                   "activity"=>"Pigs",
+                   "sector"=>"Agriculture",
                    "use"=>"to buy pigs in neighboring towns, which offer her a good price, and cheese",
                    "location"=>{"country_code"=>"CO", "country"=>"Colombia", "town"=>"San Jacinto-Bol\u00EDvar",
                                 "geo"=>{"level"=>"country", "pairs"=>"4 -72", "type"=>"point"}},
-                   "partner_id"=>154, "posted_date"=>"2012-02-12T21:50:03Z", "planned_expiration_date"=>"2012-03-13T21:50:03Z",
-                   "loan_amount"=>525, "borrower_count"=>1},
-                  {"id"=>389757, "name"=>"Orfilia De La Paz", "description"=>{"languages"=>["es", "en"]},
-                   "status"=>"fundraising", "funded_amount"=>0, "basket_amount"=>0,
-                   "image"=>{"id"=>753469, "template_id"=>1}, "activity"=>"Grocery Store", "sector"=>"Food",
-                   "use"=>"To buy rice, soap, sugar, cooking oil, cold cuts, and eggs.",
-                   "location"=>{"country_code"=>"SV", "country"=>"El Salvador", "town"=>"San Miguel, San Miguel",
-                                "geo"=>{"level"=>"country", "pairs"=>"13.833333 -88.916667", "type"=>"point"}},
-                   "partner_id"=>167, "posted_date"=>"2012-02-12T21:50:03Z", "planned_expiration_date"=>"2012-03-13T21:50:03Z",
-                   "loan_amount"=>750, "borrower_count"=>1},
-                  {"id"=>389753, "name"=>"Olga", "description"=>{"languages"=>["es", "en"]},
-                   "status"=>"fundraising", "funded_amount"=>0, "basket_amount"=>0,
-                   "image"=>{"id"=>1001607, "template_id"=>1}, "activity"=>"Agriculture", "sector"=>"Agriculture",
-                   "use"=>"to contract laborers",
-                   "location"=>{"country_code"=>"PE", "country"=>"Peru", "town"=>"CUSCO",
-                                "geo"=>{"level"=>"town", "pairs"=>"-13.518333 -71.978056", "type"=>"point"}},
-                   "partner_id"=>71, "posted_date"=>"2012-02-12T21:50:02Z", "planned_expiration_date"=>"2012-03-13T21:50:02Z",
-                   "loan_amount"=>750, "borrower_count"=>1},
-                  {"id"=>391172, "name"=>"Mariya Levai", "description"=>{"languages"=>["ru", "en"]},
-                   "status"=>"fundraising", "funded_amount"=>0, "basket_amount"=>0,
-                   "image"=>{"id"=>1004122, "template_id"=>1}, "activity"=>"Personal Housing Expenses", "sector"=>"Housing",
-                   "use"=>"to remodel her home, where her son and his bride will live after their wedding",
-                   "location"=>{"country_code"=>"UA", "country"=>"Ukraine", "town"=>"Khoost",
-                                "geo"=>{"level"=>"country", "pairs"=>"49 32", "type"=>"point"}},
-                   "partner_id"=>26, "posted_date"=>"2012-02-12T21:30:02Z", "planned_expiration_date"=>"2012-03-13T21:30:02Z",
-                   "loan_amount"=>1875, "borrower_count"=>1},
-                  {"id"=>389751, "name"=>"Idalia Del Carmen", "description"=>{"languages"=>["es", "en"]},
-                   "status"=>"fundraising", "funded_amount"=>0, "basket_amount"=>0,
-                   "image"=>{"id"=>890260, "template_id"=>1}, "activity"=>"Grocery Store", "sector"=>"Food",
-                   "use"=>"to buy powdered milk, coffee, soft drinks, rice, oil, and sausages",
-                   "location"=>{"country_code"=>"SV", "country"=>"El Salvador", "town"=>"Usulut\u00E1n",
-                                "geo"=>{"level"=>"country", "pairs"=>"13.833333 -88.916667", "type"=>"point"}},
-                   "partner_id"=>167, "posted_date"=>"2012-02-12T21:20:06Z", "planned_expiration_date"=>"2012-03-13T21:20:06Z",
-                   "loan_amount"=>1200, "borrower_count"=>1},
-                  {"id"=>389750, "name"=>"Manuel Antonio", "description"=>{"languages"=>["es", "en"]},
-                   "status"=>"fundraising", "funded_amount"=>0, "basket_amount"=>0,
-                   "image"=>{"id"=>731850, "template_id"=>1}, "activity"=>"Natural Medicines", "sector"=>"Health",
-                   "use"=>"to purchase vitamins, medical items, rejuvenators, and health supplements. ",
-                   "location"=>{"country_code"=>"SV", "country"=>"El Salvador", "town"=>"Concepcion Batres, Usulutan",
-                                "geo"=>{"level"=>"country", "pairs"=>"13.833333 -88.916667", "type"=>"point"}},
-                   "partner_id"=>167, "posted_date"=>"2012-02-12T21:20:03Z", "planned_expiration_date"=>"2012-03-13T21:20:03Z",
-                   "loan_amount"=>700, "borrower_count"=>1},
-                  {"id"=>389748, "name"=>"Retroceder Nunca Rendirse Jamas - El Tambo Group", "description"=>{"languages"=>["es", "en"]},
-                   "status"=>"fundraising", "funded_amount"=>0, "basket_amount"=>0,
-                   "image"=>{"id"=>1001588, "template_id"=>1}, "activity"=>"Clothing Sales", "sector"=>"Clothing",
-                   "use"=>"to buy articles of clothing to sell",
-                   "location"=>{"country_code"=>"PE", "country"=>"Peru", "town"=>"HUANCAYO",
-                                "geo"=>{"level"=>"town", "pairs"=>"-12.066667 -75.233333", "type"=>"point"}},
-                   "partner_id"=>93, "posted_date"=>"2012-02-12T21:10:09Z", "planned_expiration_date"=>"2012-03-13T21:10:09Z",
-                   "loan_amount"=>2800, "borrower_count"=>8},
-                  {"id"=>389747, "name"=>"Jorge Boanerges", "description"=>{"languages"=>["es", "en"]},
-                   "status"=>"fundraising", "funded_amount"=>0, "basket_amount"=>0,
-                   "image"=>{"id"=>852652, "template_id"=>1}, "activity"=>"Furniture Making", "sector"=>"Manufacturing",
-                   "use"=>"to purchase wood and a chainsaw.",
-                   "location"=>{"country_code"=>"SV", "country"=>"El Salvador",
-                                "geo"=>{"level"=>"country", "pairs"=>"13.833333 -88.916667", "type"=>"point"}},
-                   "partner_id"=>167, "posted_date"=>"2012-02-12T21:10:04Z", "planned_expiration_date"=>"2012-03-13T21:10:04Z",
-                   "loan_amount"=>800, "borrower_count"=>1},
-                  {"id"=>389746, "name"=>"Maria Cristina", "description"=>{"languages"=>["es", "en"]},
-                   "status"=>"fundraising", "funded_amount"=>0, "basket_amount"=>0,
-                   "image"=>{"id"=>867160, "template_id"=>1}, "activity"=>"Food Production/Sales", "sector"=>"Food",
-                   "use"=>"to repair the car from which she makes sales.",
-                   "location"=>{"country_code"=>"SV", "country"=>"El Salvador",
-                                "geo"=>{"level"=>"country", "pairs"=>"13.833333 -88.916667", "type"=>"point"}},
-                   "partner_id"=>167, "posted_date"=>"2012-02-12T21:00:04Z", "planned_expiration_date"=>"2012-03-13T21:00:04Z",
-                   "loan_amount"=>600, "borrower_count"=>1},
-                  {"id"=>389661, "name"=>"Diane", "description"=>{"languages"=>["es", "en"]},
-                   "status"=>"fundraising", "funded_amount"=>0, "basket_amount"=>0,
-                   "image"=>{"id"=>1001505, "template_id"=>1}, "activity"=>"Shoe Sales", "sector"=>"Retail",
-                   "use"=>"to buy leather, glue, insoles, buckles, and other items for his business of making shoes by order.",
-                   "location"=>{"country_code"=>"BO", "country"=>"Bolivia", "town"=>"La Paz",
-                                "geo"=>{"level"=>"town", "pairs"=>"-16.5 -68.15", "type"=>"point"}},
-                   "partner_id"=>48, "posted_date"=>"2012-02-12T21:00:03Z", "planned_expiration_date"=>"2012-03-13T21:00:03Z",
-                   "loan_amount"=>700, "borrower_count"=>1},
-                  {"id"=>389659, "name"=>"Israel", "description"=>{"languages"=>["es", "en"]},
-                   "status"=>"fundraising", "funded_amount"=>0, "basket_amount"=>0,
-                   "image"=>{"id"=>1001502, "template_id"=>1}, "activity"=>"Personal Housing Expenses", "sector"=>"Housing",
-                   "use"=>"to repair his room in his parents\u2019 house.",
-                   "location"=>{"country_code"=>"BO", "country"=>"Bolivia", "town"=>"La Paz",
-                                "geo"=>{"level"=>"town", "pairs"=>"-16.5 -68.15", "type"=>"point"}},
-                   "partner_id"=>48, "posted_date"=>"2012-02-12T20:50:03Z", "planned_expiration_date"=>"2012-03-13T20:50:03Z",
-                   "loan_amount"=>600, "borrower_count"=>1},
-                  {"id"=>389653, "name"=>"Sandra", "description"=>{"languages"=>["es", "en"]},
-                   "status"=>"fundraising", "funded_amount"=>50, "basket_amount"=>25,
-                   "image"=>{"id"=>1001497, "template_id"=>1}, "activity"=>"Higher education costs", "sector"=>"Education",
-                   "use"=>" to pay registration fees at the university in order to continue her university studies.",
-                   "location"=>{"country_code"=>"BO", "country"=>"Bolivia", "town"=>"La Paz",
-                                "geo"=>{"level"=>"town", "pairs"=>"-16.5 -68.15", "type"=>"point"}},
-                   "partner_id"=>48, "posted_date"=>"2012-02-12T20:50:02Z", "planned_expiration_date"=>"2012-03-13T20:50:02Z",
-                   "loan_amount"=>400, "borrower_count"=>1},
-                  {"id"=>389743, "name"=>"Maria", "description"=>{"languages"=>["es", "en"]},
-                   "status"=>"fundraising", "funded_amount"=>0, "basket_amount"=>0,
-                   "image"=>{"id"=>1001598, "template_id"=>1}, "activity"=>"Food Stall", "sector"=>"Food",
-                   "use"=>"to buy materials to refurbish her business facility",
-                   "location"=>{"country_code"=>"PE", "country"=>"Peru", "town"=>"CUSCO",
-                                "geo"=>{"level"=>"town", "pairs"=>"-13.518333 -71.978056", "type"=>"point"}},
-                   "partner_id"=>71, "posted_date"=>"2012-02-12T20:40:03Z", "planned_expiration_date"=>"2012-03-13T20:40:03Z",
-                   "loan_amount"=>1125, "borrower_count"=>1},
-                  {"id"=>389650, "name"=>"Ernesto", "description"=>{"languages"=>["es", "en"]},
-                   "status"=>"fundraising", "funded_amount"=>0, "basket_amount"=>0,
-                   "image"=>{"id"=>1001491, "template_id"=>1}, "activity"=>"Personal Housing Expenses", "sector"=>"Housing",
-                   "use"=>"to build an exterior wall to his house in order to give his family more security.",
-                   "location"=>{"country_code"=>"BO", "country"=>"Bolivia", "town"=>"La Paz",
-                                "geo"=>{"level"=>"town", "pairs"=>"-16.5 -68.15", "type"=>"point"}},
-                   "partner_id"=>48, "posted_date"=>"2012-02-12T20:40:02Z", "planned_expiration_date"=>"2012-03-13T20:40:02Z",
-                   "loan_amount"=>600, "borrower_count"=>1},
-                  {"id"=>389739, "name"=>"Eladio Maximo Diaz Escriba", "description"=>{"languages"=>["es", "en"]},
-                   "status"=>"fundraising", "funded_amount"=>0, "basket_amount"=>0,
-                   "image"=>{"id"=>1001591, "template_id"=>1}, "activity"=>"Soft Drinks", "sector"=>"Food",
-                   "use"=>"to buy all kinds of drinks to sell.",
-                   "location"=>{"country_code"=>"PE", "country"=>"Peru", "town"=>"Ica",
-                                "geo"=>{"level"=>"country", "pairs"=>"-10 -76", "type"=>"point"}},
-                   "partner_id"=>139, "posted_date"=>"2012-02-12T20:20:04Z", "planned_expiration_date"=>"2012-03-13T20:20:04Z",
-                   "loan_amount"=>1125, "borrower_count"=>1},
-                  {"id"=>389742, "name"=>"Jose Salvador", "description"=>{"languages"=>["es", "en"]},
-                   "status"=>"fundraising", "funded_amount"=>0, "basket_amount"=>0,
-                   "image"=>{"id"=>711242, "template_id"=>1}, "activity"=>"Farming", "sector"=>"Agriculture",
-                   "use"=>"to purchase fertilizer and herbicides. ",
-                   "location"=>{"country_code"=>"SV", "country"=>"El Salvador", "town"=>"San Rafael de Oriente, San Miguel",
-                                "geo"=>{"level"=>"country", "pairs"=>"13.833333 -88.916667", "type"=>"point"}},
-                   "partner_id"=>167, "posted_date"=>"2012-02-12T20:20:04Z", "planned_expiration_date"=>"2012-03-13T20:20:04Z",
-                   "loan_amount"=>800, "borrower_count"=>1},
-                  {"id"=>389738, "name"=>"Faustino", "description"=>{"languages"=>["es", "en"]},
-                   "status"=>"fundraising", "funded_amount"=>0, "basket_amount"=>0,
-                   "image"=>{"id"=>1001589, "template_id"=>1}, "activity"=>"Agriculture", "sector"=>"Agriculture",
-                   "use"=>"to purchase fertilizer and to hire laborers.  ",
-                   "location"=>{"country_code"=>"PE", "country"=>"Peru", "town"=>"CUSCO",
-                                "geo"=>{"level"=>"town", "pairs"=>"-13.518333 -71.978056", "type"=>"point"}},
-                   "partner_id"=>71, "posted_date"=>"2012-02-12T20:20:03Z", "planned_expiration_date"=>"2012-03-13T20:20:03Z",
-                   "loan_amount"=>1125, "borrower_count"=>1},
-                  {"id"=>389740, "name"=>"Ana Lucila", "description"=>{"languages"=>["es", "en"]},
-                   "status"=>"fundraising", "funded_amount"=>0, "basket_amount"=>0,
-                   "image"=>{"id"=>813331, "template_id"=>1}, "activity"=>"Clothing Sales", "sector"=>"Clothing",
-                   "use"=>"to buy blouses, skirts, pants and underwear",
-                   "location"=>{"country_code"=>"SV", "country"=>"El Salvador",
-                                "geo"=>{"level"=>"country", "pairs"=>"13.833333 -88.916667", "type"=>"point"}},
-                   "partner_id"=>167, "posted_date"=>"2012-02-12T20:10:02Z", "planned_expiration_date"=>"2012-03-13T20:10:02Z",
-                   "loan_amount"=>650, "borrower_count"=>1},
-                  {"id"=>389724, "name"=>"Wilfredo Valle", "description"=>{"languages"=>["es", "en"]},
-                   "status"=>"fundraising", "funded_amount"=>0, "basket_amount"=>0,
-                   "image"=>{"id"=>1001574, "template_id"=>1}, "activity"=>"Services", "sector"=>"Services",
-                   "use"=>"To buy steel, reinforcing rods, gloves, tools, and other materials.",
-                   "location"=>{"country_code"=>"NI", "country"=>"Nicaragua", "town"=>"Leon",
-                                "geo"=>{"level"=>"town", "pairs"=>"12.435556 -86.879444", "type"=>"point"}},
-                   "partner_id"=>96, "posted_date"=>"2012-02-12T20:00:04Z", "planned_expiration_date"=>"2012-03-13T20:00:04Z",
-                   "loan_amount"=>725, "borrower_count"=>1},
+                   "partner_id"=>154, "posted_date"=>"2012-02-12T21:50:03Z",
+                   "planned_expiration_date"=>"2012-03-13T21:50:03Z",
+                   "loan_amount"=>525,
+                   "borrower_count"=>1},
+
                   {"id"=>389093, "name"=>"Sarmen Aghakhanyan", "description"=>{"languages"=>["en"]},
                    "status"=>"fundraising", "funded_amount"=>0, "basket_amount"=>0,
                    "image"=>{"id"=>1000584, "template_id"=>1}, "activity"=>"Cattle", "sector"=>"Agriculture",
@@ -167,11 +45,23 @@ describe Parser do
                    "location"=>{"country_code"=>"AM", "country"=>"Armenia", "town"=>"Yelpin village of Vayots Dzor region",
                                 "geo"=>{"level"=>"country", "pairs"=>"40 45", "type"=>"point"}},
                    "partner_id"=>169, "posted_date"=>"2012-02-12T20:00:03Z", "planned_expiration_date"=>"2012-03-13T20:00:03Z",
-                   "loan_amount"=>1500, "borrower_count"=>1}]}
+                   "loan_amount"=>1500, "borrower_count"=>1}
+                 ]}
+
+    redis = Redis.new
+    @redis = Redis::Namespace.new(:random_test, :redis => redis)
+
+    @data['loans'].each do |loan|
+      Loan.create loan
+    end
+  end
+
+  after do
+    @redis.keys.each { |k| @redis.del k }
   end
 
   it "sets data in redis" do
-
+    binding.pry
   end
 
 end
