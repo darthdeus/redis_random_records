@@ -12,3 +12,7 @@ gem 'sinatra-contrib'
 gem 'awesome_print'
 
 gem 'slim'
+
+group :development, :test do
+  gem 'rspec'
+end

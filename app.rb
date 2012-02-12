@@ -21,6 +21,9 @@ class RandomRecords < Sinatra::Base
   get '/' do
     require 'open-uri'
     json = open('http://api.kivaws.org/v1/loans/newest.json').read
+
+
+
     @json = MultiJson.decode(json)
     slim :index
   end
