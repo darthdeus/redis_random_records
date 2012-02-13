@@ -1,5 +1,5 @@
 form.well.form-search action="/" method="get"
-  input name="search" placeholder="Search" type="text"
+  input name="search" placeholder="Search" type="text" value="#{params[:search]}"
   button type="submit" class="btn" Search
 
 - if params[:reloaded]
@@ -28,4 +28,4 @@ table class="table table-striped table-bordered table-condensed"
 .actions
   - if params[:search]
     a.btn.btn-primary href="/" Give me 10 random loans
-  a.btn href="/fetch" Fetch new loans
+  a.btn href="/fetch" Fetch new loans from the feed

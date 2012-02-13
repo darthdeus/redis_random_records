@@ -18,13 +18,21 @@ require 'loan'
 
 class RandomRecords < Sinatra::Base
 
+  FEED_URL = 'http://api.kivaws.org/v1/loans/newest.json'
+
   configure :development do
     register Sinatra::Reloader
   end
 
   get '/' do
     if params[:search]
-      @loans = Loan.all.select { |loan| loan.name.downcase[params[:search].downcase] || loan.status[params[:search]] }
+      @loans = Loan.all.select do |loan|
+        # we search across all defined attributes ...
+        # this can be easily substituted for something like %w{name status} to search only on those
+        Loan::ATTRIBUTES.inject(false) do |res, kw|
+          res || loan.send(kw).downcase[params[:search].downcase]
+        end
+      end
     else
       @loans = Loan.all.to_a.sample(10)
     end
@@ -37,10 +45,9 @@ class RandomRecords < Sinatra::Base
 
   get '/fetch' do
     require 'open-uri'
-    json = open('http://api.kivaws.org/v1/loans/newest.json').read
+    json = open(FEED_URL).read
 
     @json = MultiJson.decode(json)
-
     @json['loans'].each do |loan|
       Loan.create loan
     end
