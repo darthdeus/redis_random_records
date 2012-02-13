@@ -2,7 +2,7 @@ require 'rubygems'
 require 'bundler'
 Bundler.require :default
 require 'sinatra/reloader'
-
+require 'json'
 
 if ENV['REDISTOGO_URL']
   Ohm.connect(url: ENV["REDISTOGO_URL"])
@@ -12,12 +12,8 @@ else
   # $redis = Redis.new
 end
 
-class Loan < Ohm::Model
-  %w{name description status funded_amount basket_amount image activity sector use location partner_id posted_date planned_expiration_date loan_amount borrower_count}.each do |attr|
-    attribute attr
-  end
-  index :name
-end
+$:.unshift File.dirname(__FILE__)
+require 'loan'
 
 
 class RandomRecords < Sinatra::Base
@@ -33,6 +29,10 @@ class RandomRecords < Sinatra::Base
       @loans = Loan.all.to_a.sample(10)
     end
     slim :index
+  end
+
+  get '/random.json' do
+    Loan.all.to_a.sample(10).map(&:to_hash).to_json.gsub('\\', '')
   end
 
   get '/fetch' do

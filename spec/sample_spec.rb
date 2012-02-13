@@ -3,14 +3,9 @@ require 'redis'
 require 'rspec'
 require 'ohm'
 require 'pry'
+require 'json'
 
-
-class Loan < Ohm::Model
-  %w{name description status funded_amount basket_amount image activity sector use location partner_id posted_date planned_expiration_date loan_amount borrower_count}.each do |attr|
-    attribute attr
-  end
-  index :name
-end
+load File.dirname(__FILE__) + "/../loan.rb"
 
 describe 'Sample data' do
   before do
@@ -185,6 +180,7 @@ describe 'Sample data' do
   end
 
   it "does nothing actually ... toy around with Redis by running the spec" do
+    a = Loan.all.first
     binding.pry
   end
 
