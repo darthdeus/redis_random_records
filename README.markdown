@@ -2,7 +2,7 @@
 
 This application is a solution for the [CloudSpokes Random Recrod with Ruby and Redis challenge](http://www.cloudspokes.com/challenges/1375).
 
-It uses [Ohm](http://ohm.keyvalue.org/) for abstracting Redis into an ORM.
+It uses [Ohm](http://ohm.keyvalue.org/) for abstracting Redis into objects for easier manipulation.
 
 To run, make sure you have Redis installed, and then simply run in the application's directory
 
