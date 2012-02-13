@@ -40,6 +40,7 @@ class RandomRecords < Sinatra::Base
   end
 
   get '/random.json' do
+    content_type :json
     Loan.all.to_a.sample(10).map(&:to_hash).to_json
   end
 
