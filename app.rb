@@ -5,10 +5,18 @@ require 'sinatra/reloader'
 
 
 if ENV['REDISTOGO_URL']
-  uri = URI.parse(ENV["REDISTOGO_URL"])
-  $redis = Redis.new(:host => uri.host, :port => uri.port, :password => uri.password)
+  Ohm.connect(url: ENV["REDISTOGO_URL"])
+  # $redis = Redis.new(:host => uri.host, :port => uri.port, :password => uri.password)
 else
-  $redis = Redis.new
+  Ohm.connect
+  # $redis = Redis.new
+end
+
+class Loan < Ohm::Model
+  %w{name description status funded_amount basket_amount image activity sector use location partner_id posted_date planned_expiration_date loan_amount borrower_count}.each do |attr|
+    attribute attr
+  end
+  index :name
 end
 
 
@@ -19,13 +27,21 @@ class RandomRecords < Sinatra::Base
   end
 
   get '/' do
+    @loans = Loan.all.to_a.sample(10)
+    slim :index
+  end
+
+  get '/fetch' do
     require 'open-uri'
     json = open('http://api.kivaws.org/v1/loans/newest.json').read
 
-
-
     @json = MultiJson.decode(json)
-    slim :index
+
+    @json['loans'].each do |loan|
+      Loan.create loan
+    end
+
+    redirect '/?reloaded'
   end
 
 end

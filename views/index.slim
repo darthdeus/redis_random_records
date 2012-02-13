@@ -1,3 +1,14 @@
-h1 Hello Redis!
+h1 Random Records with Ruby and Redis
 
-pre = @json
+
+h2 Displaying 10 random records
+ul
+  - @loans.each do |loan|
+    li = loan.name
+
+
+- if params['reloaded']
+  | Loan data was reloaded
+
+.actions
+  a.btn.primary href="/fetch" Fetch new loans

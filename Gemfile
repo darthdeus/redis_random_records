@@ -9,8 +9,7 @@ gem 'multi_json'
 gem 'pry'
 gem 'thin'
 gem 'sinatra-contrib'
-gem 'awesome_print'
-
+gem 'ohm'
 gem 'slim'
 
 group :development, :test do
