@@ -1,13 +1,9 @@
 require 'rubygems'
+require 'redis'
 require 'rspec'
 require 'ohm'
 require 'pry'
 
-class Parser
-  def dump(instance, data)
-    data["loans"]
-  end
-end
 
 class Loan < Ohm::Model
   %w{name description status funded_amount basket_amount image activity sector use location partner_id posted_date planned_expiration_date loan_amount borrower_count}.each do |attr|
@@ -16,8 +12,9 @@ class Loan < Ohm::Model
   index :name
 end
 
-describe Parser do
+describe 'Sample data' do
   before do
+    # let's get some data
     @data = {"paging"=>{"page"=>1, "total"=>2632, "page_size"=>20, "pages"=>132},
              "loans"=>
                  [{"id"=>389754, "name"=>"Vilma Pacheco Anillo", "description"=>{"languages"=>["es", "en"]},
@@ -184,9 +181,10 @@ describe Parser do
     @data['loans'].each do |loan|
       Loan.create loan
     end
+    @redis = Redis.new
   end
 
-  it "sets data in redis" do
+  it "does nothing actually ... toy around with Redis by running the spec" do
     binding.pry
   end
 

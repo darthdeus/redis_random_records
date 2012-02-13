@@ -27,7 +27,11 @@ class RandomRecords < Sinatra::Base
   end
 
   get '/' do
-    @loans = Loan.all.to_a.sample(10)
+    if params[:search]
+      @loans = Loan.all.select { |loan| loan.name.downcase[params[:search].downcase] || loan.status[params[:search]] }
+    else
+      @loans = Loan.all.to_a.sample(10)
+    end
     slim :index
   end
 
@@ -41,7 +45,7 @@ class RandomRecords < Sinatra::Base
       Loan.create loan
     end
 
-    redirect '/?reloaded'
+    redirect '/?reloaded=1'
   end
 
 end
