@@ -1,10 +1,11 @@
-form.well action="/" method="get"
-  label Fooboo
-  input.span2 type="text" name="search" placeholder="Search"
-  input class="span2" name="search" placeholder="Search" type="text"
-
-  span class="help-inline" Associated help text!
+form.well.form-search action="/" method="get"
+  input.search-query name="search" placeholder="Search" type="text"
   button type="submit" class="btn" Search
+
+form class="well form-search"
+  input type="text" class="input-medium search-query"
+  button type="submit" class="btn" Search
+
 
 form class="well"
   label Label name
