@@ -32,7 +32,7 @@ class RandomRecords < Sinatra::Base
   end
 
   get '/random.json' do
-    Loan.all.to_a.sample(10).map(&:to_hash).to_json.gsub('\\', '')
+    Loan.all.to_a.sample(10).map(&:to_hash).to_json
   end
 
   get '/fetch' do

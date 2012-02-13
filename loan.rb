@@ -7,10 +7,11 @@ class Loan < Ohm::Model
   index :name
 
   def to_hash
-    # join all attributes in a hash
+    # join all attributes in a hash, Ohm returns only ID by default, that's why we have to override here
     attributes = ATTRIBUTES.inject({}) do |hash, key|
       value = self.send(key)
-      # even though this is ugly, it's the simplest way to convert Hash in a String to JSON
+      # Even though this is ugly, it's the simplest way to convert Ruby Hash in a String to JSON.
+      # If we don't do this, the nested values won't work, because they're being saved as Strings into Redis.
       if %w{description image location}.include?(key)
         value = eval(value)
       end
