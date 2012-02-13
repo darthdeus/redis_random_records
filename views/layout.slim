@@ -2,8 +2,14 @@ doctype
 html
   head
     link rel="stylesheet" href="/css/bootstrap.css"
+    link rel="stylesheet" href="/css/bootstrap-responsive.css"
     link rel="stylesheet" href="/style.css"
+
   body
     .container
 
-      == yield
+      header
+        h1 Random Records with Ruby and Redis
+
+      section
+        == yield
